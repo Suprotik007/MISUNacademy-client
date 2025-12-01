@@ -1,5 +1,6 @@
 [
   {
+    "id": "1",
     "title": "Full-Stack Web Development Bootcamp",
     "description": "A complete, modern full-stack development bootcamp covering HTML, CSS, JavaScript, React, Node.js, MongoDB, authentication, deployment, and best practices.",
     "instructor": "James Collins",
@@ -7,25 +8,14 @@
     "category": "Web Development",
     "tags": ["full-stack", "javascript", "react", "node", "mongodb"],
     "syllabus": [
-      {
-        "title": "Introduction to Web Development",
-        "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ"
-      },
-      {
-        "title": "Frontend Development with React",
-        "videoUrl": "https://www.youtube.com/embed/SqcY0GlETPk"
-      },
-      {
-        "title": "Backend with Node & Express",
-        "videoUrl": "https://www.youtube.com/embed/Oe421EPjeBE"
-      },
-      {
-        "title": "MongoDB for Beginners",
-        "videoUrl": "https://www.youtube.com/embed/c2M-rlkkT5o"
-      }
+      { "title": "Introduction to Web Development", "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+      { "title": "Frontend Development with React", "videoUrl": "https://www.youtube.com/embed/SqcY0GlETPk" },
+      { "title": "Backend with Node & Express", "videoUrl": "https://www.youtube.com/embed/Oe421EPjeBE" },
+      { "title": "MongoDB for Beginners", "videoUrl": "https://www.youtube.com/embed/c2M-rlkkT5o" }
     ]
   },
   {
+    "id": "2",
     "title": "Data Science & Machine Learning with Python",
     "description": "Learn data analysis, visualization, machine learning algorithms, model training, and evaluation using Python, NumPy, Pandas, Matplotlib, and Scikit-Learn.",
     "instructor": "Dr. Sophia Martinez",
@@ -33,25 +23,14 @@
     "category": "Data Science",
     "tags": ["python", "ml", "data-science", "pandas", "numpy"],
     "syllabus": [
-      {
-        "title": "Python for Data Analysis",
-        "videoUrl": "https://www.youtube.com/embed/rfscVS0vtbw"
-      },
-      {
-        "title": "Data Cleaning & Visualization",
-        "videoUrl": "https://www.youtube.com/embed/DAIeuox_2z8"
-      },
-      {
-        "title": "Machine Learning Fundamentals",
-        "videoUrl": "https://www.youtube.com/embed/GwIo3gDZCVQ"
-      },
-      {
-        "title": "Model Building & Deployment",
-        "videoUrl": "https://www.youtube.com/embed/aircAruvnKk"
-      }
+      { "title": "Python for Data Analysis", "videoUrl": "https://www.youtube.com/embed/rfscVS0vtbw" },
+      { "title": "Data Cleaning & Visualization", "videoUrl": "https://www.youtube.com/embed/DAIeuox_2z8" },
+      { "title": "Machine Learning Fundamentals", "videoUrl": "https://www.youtube.com/embed/GwIo3gDZCVQ" },
+      { "title": "Model Building & Deployment", "videoUrl": "https://www.youtube.com/embed/aircAruvnKk" }
     ]
   },
   {
+    "id": "3",
     "title": "UI/UX Design Masterclass 2025",
     "description": "Master UI/UX design fundamentals, wireframing, prototyping, user research, color psychology, typography, and Figma workflows to design modern digital products.",
     "instructor": "Aisha Khan",
@@ -59,25 +38,14 @@
     "category": "Design",
     "tags": ["ui", "ux", "figma", "design", "prototyping"],
     "syllabus": [
-      {
-        "title": "Understanding Users & Research",
-        "videoUrl": "https://www.youtube.com/embed/WpkDN78P884"
-      },
-      {
-        "title": "Wireframing & UI Principles",
-        "videoUrl": "https://www.youtube.com/embed/c9Wg6Cb_YlU"
-      },
-      {
-        "title": "Figma Crash Course",
-        "videoUrl": "https://www.youtube.com/embed/jwC1Qd5F80M"
-      },
-      {
-        "title": "Design Systems & Prototyping",
-        "videoUrl": "https://www.youtube.com/embed/TXgQ1tT7lxA"
-      }
+      { "title": "Understanding Users & Research", "videoUrl": "https://www.youtube.com/embed/WpkDN78P884" },
+      { "title": "Wireframing & UI Principles", "videoUrl": "https://www.youtube.com/embed/c9Wg6Cb_YlU" },
+      { "title": "Figma Crash Course", "videoUrl": "https://www.youtube.com/embed/jwC1Qd5F80M" },
+      { "title": "Design Systems & Prototyping", "videoUrl": "https://www.youtube.com/embed/TXgQ1tT7lxA" }
     ]
   },
   {
+    "id": "4",
     "title": "Cybersecurity & Ethical Hacking",
     "description": "Learn penetration testing, Linux essentials, network security, OWASP Top 10, Wireshark, Metasploit, and ethical hacking methodologies.",
     "instructor": "Daniel Wright",
@@ -85,25 +53,14 @@
     "category": "Cybersecurity",
     "tags": ["cybersecurity", "ethical-hacking", "linux", "pentesting"],
     "syllabus": [
-      {
-        "title": "Introduction to Cybersecurity",
-        "videoUrl": "https://www.youtube.com/embed/feU3D7U9a4I"
-      },
-      {
-        "title": "Linux for Hackers",
-        "videoUrl": "https://www.youtube.com/embed/tQnXhNZ8U8Q"
-      },
-      {
-        "title": "Network Attacks & Defense",
-        "videoUrl": "https://www.youtube.com/embed/-fJ6bQ9yBiA"
-      },
-      {
-        "title": "Practical Ethical Hacking",
-        "videoUrl": "https://www.youtube.com/embed/SgJQ5S5jKDk"
-      }
+      { "title": "Introduction to Cybersecurity", "videoUrl": "https://www.youtube.com/embed/feU3D7U9a4I" },
+      { "title": "Linux for Hackers", "videoUrl": "https://www.youtube.com/embed/tQnXhNZ8U8Q" },
+      { "title": "Network Attacks & Defense", "videoUrl": "https://www.youtube.com/embed/-fJ6bQ9yBiA" },
+      { "title": "Practical Ethical Hacking", "videoUrl": "https://www.youtube.com/embed/SgJQ5S5jKDk" }
     ]
   },
   {
+    "id": "5",
     "title": "Digital Marketing Strategy 2025",
     "description": "A complete course on SEO, social media marketing, paid advertising, email automation, analytics, and content strategy.",
     "instructor": "Emily Carter",
@@ -111,22 +68,10 @@
     "category": "Marketing",
     "tags": ["seo", "social-media", "google-ads", "email-marketing"],
     "syllabus": [
-      {
-        "title": "SEO Fundamentals",
-        "videoUrl": "https://www.youtube.com/embed/YSnC4id8cwE"
-      },
-      {
-        "title": "Social Media Strategy",
-        "videoUrl": "https://www.youtube.com/embed/MN3BVIAi0eI"
-      },
-      {
-        "title": "Paid Ads Campaigns",
-        "videoUrl": "https://www.youtube.com/embed/L34OHQq04Oc"
-      },
-      {
-        "title": "Analytics & Automation",
-        "videoUrl": "https://www.youtube.com/embed/sB8zPNZbR2g"
-      }
+      { "title": "SEO Fundamentals", "videoUrl": "https://www.youtube.com/embed/YSnC4id8cwE" },
+      { "title": "Social Media Strategy", "videoUrl": "https://www.youtube.com/embed/MN3BVIAi0eI" },
+      { "title": "Paid Ads Campaigns", "videoUrl": "https://www.youtube.com/embed/L34OHQq04Oc" },
+      { "title": "Analytics & Automation", "videoUrl": "https://www.youtube.com/embed/sB8zPNZbR2g" }
     ]
   }
 ]

@@ -18,7 +18,7 @@ const Sidebar: FC<SidebarProps> = ({ isOpen, onClose }) => {
     <nav className="flex flex-col pl-5 gap-4 font-semibold text-gray-700 dark:text-gray-300">
      
       <Link
-        href="/products"
+        href="/"
         className="flex items-center space-x-3 px-4 py-2 rounded-md hover:bg-violet-600 hover:text-white transition"
       >
         <FiBox size={20} />

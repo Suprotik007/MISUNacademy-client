@@ -5,6 +5,7 @@ import api from "../lib/Axios";
 import Link from "next/link";
 
 interface Course {
+  id: number;
   title: string;
   description: string;
   instructor: string;
@@ -39,7 +40,7 @@ export default function HomePage() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {courses.map(course => (
         <div
-          key={course._id}
+          key={course.id}
           className="bg-gray-100 rounded-xl shadow-md border border-gray-200 p-5 transition-transform hover:scale-[1.02] hover:shadow-lg"
         >
           <h2 className="text-xl font-semibold text-gray-900">{course.title}</h2>
@@ -52,7 +53,7 @@ export default function HomePage() {
 
           <div className="mt-5">
             <Link
-              href={`/course/${course._id}`}
+              href={`/details/${course.id}`}
               className="inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg font-medium 
                          hover:bg-indigo-700 transition-colors"
             >
