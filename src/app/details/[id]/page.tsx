@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+
 
 interface SyllabusItem {
   title: string;
@@ -23,7 +23,7 @@ interface Course {
 const CourseDetailsPage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
-  const { data: session } = useSession();
+ 
 
   const id = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
 
@@ -55,10 +55,10 @@ const CourseDetailsPage: React.FC = () => {
   if (!course) return <p className="text-center mt-20 text-red-500">Course not found.</p>;
 
   const handleEnroll = () => {
-    if (session) {
-      router.push(`/checkout/${course.id}`);
+    if (id) {
+      router.push(`/PaymentPage/${course.id}`);
     } else {
-      router.push('/login');
+      router.push('/');
     }
   };
 
@@ -66,8 +66,8 @@ const CourseDetailsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6 grid lg:grid-cols-3 gap-10">
       {/* Main Content */}
       <div className="lg:col-span-2 space-y-6">
-        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-500">{course.title}</h1>
-        <p className="text-gray-700 dark:text-gray-300 text-lg">{course.description}</p>
+        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-300">{course.title}</h1>
+        <p className="text-gray-700 dark:text-gray-5 00 text-lg">{course.description}</p>
 
         {/* Syllabus */}
         <div className="space-y-4">
