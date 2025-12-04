@@ -75,7 +75,7 @@ const handlePayment = async (e: FormEvent) => {
 
     if (res.ok) {
       alert("Payment recorded & enrolled successfully!");
-      // router.push("/dashboard"); 
+      router.push("/studentDashboard"); 
     } else {
       alert(data.error || "Failed");
     }

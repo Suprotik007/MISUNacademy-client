@@ -26,7 +26,7 @@ const Navbar: FC = () => {
       </Link>
 
       <Link
-        href="/dashboard/add-product"
+        href="/studentDashboard"
         className="hover:text-violet-600 dark:hover:text-violet-400 transition"
       >
         Dashboard
