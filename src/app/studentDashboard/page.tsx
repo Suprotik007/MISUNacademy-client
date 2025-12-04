@@ -102,6 +102,9 @@ const StudentDashboard: React.FC = () => {
                   key={lesson.lessonTitle}
                   lesson={lesson}
                   enrollId={enroll._id}
+                  courseId={enroll._id}
+                  courseTitle={enroll.courseTitle}
+                  lessonId={lesson.lessonTitle}
                   markCompleted={markLessonCompleted}
                 />
               ))}

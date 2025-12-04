@@ -11,10 +11,20 @@ interface Progress {
 interface LessonItemProps {
   lesson: Progress;
   enrollId: string;
+  courseId: string;
+  courseTitle: string;
+  lessonId: string;
   markCompleted: (enrollId: string, lessonTitle: string) => void;
 }
 
-const LessonItem: React.FC<LessonItemProps> = ({ lesson, enrollId, markCompleted }) => {
+const LessonItem: React.FC<LessonItemProps> = ({
+  lesson,
+  enrollId,
+  courseId,
+  courseTitle,
+  lessonId,
+  markCompleted
+}) => {
   const [showAssignment, setShowAssignment] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
 
@@ -24,20 +34,18 @@ const LessonItem: React.FC<LessonItemProps> = ({ lesson, enrollId, markCompleted
   };
 
   return (
-    <div className="flex flex-col mb-2">
+    <div className="flex flex-col mb-2 border-b pb-2">
       <div className="flex items-center justify-between">
         <span>{lesson.lessonTitle}</span>
 
-        {!lesson.completed && (
+        {!lesson.completed ? (
           <button
             className="text-white bg-violet-600 px-2 py-1 rounded hover:bg-indigo-700 text-sm"
             onClick={handleComplete}
           >
             Mark Complete
           </button>
-        )}
-
-        {lesson.completed && (
+        ) : (
           <div className="flex items-center gap-2">
             <span className="text-green-500 font-semibold text-sm">✓ Completed</span>
             <button
@@ -50,8 +58,22 @@ const LessonItem: React.FC<LessonItemProps> = ({ lesson, enrollId, markCompleted
         )}
       </div>
 
-      {showAssignment && <AssignmentForm lessonTitle={lesson.lessonTitle} />}
-      {showQuiz && <QuizModal lessonTitle={lesson.lessonTitle} onClose={() => setShowQuiz(false)} />}
+      {showAssignment && (
+        <AssignmentForm
+          courseId={courseId}
+          courseTitle={courseTitle}
+          lessonId={lessonId}
+          lessonTitle={lesson.lessonTitle}
+          onClose={() => setShowAssignment(false)}
+        />
+      )}
+
+      {showQuiz && (
+        <QuizModal
+          lessonTitle={lesson.lessonTitle}
+          onClose={() => setShowQuiz(false)}
+        />
+      )}
     </div>
   );
 };

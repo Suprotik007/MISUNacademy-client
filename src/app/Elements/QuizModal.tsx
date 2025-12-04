@@ -1,12 +1,9 @@
 'use client';
-
 import React, { useState } from "react";
-
 interface QuizModalProps {
   lessonTitle: string;
   onClose: () => void;
 }
-
 interface Question {
   question: string;
   options: string[];
