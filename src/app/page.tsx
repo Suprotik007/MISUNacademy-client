@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "../lib/Axios";
+
 import Link from "next/link";
 
 interface Course {
-  id: number;
+  _id: string;
   title: string;
   description: string;
   instructor: string;
@@ -21,16 +21,12 @@ export default function HomePage() {
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const res = await api.get<Course[]>("/data/courses.json");
-        setCourses(res.data);
-      } catch (error) {
-        console.error("Failed to load courses:", error);
-      }
+    const fetchCourses = async () => {
+      const res = await fetch("http://localhost:5000/api/courses"); 
+      const data = await res.json();
+      setCourses(data);
     };
-
-    loadCourses();
+    fetchCourses();
   }, []);
 
  return (
@@ -40,7 +36,7 @@ export default function HomePage() {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {courses.map(course => (
         <div
-          key={course.id}
+          key={course._id}
           className="bg-gray-100 rounded-xl shadow-md border border-gray-200 p-5 transition-transform hover:scale-[1.02] hover:shadow-lg"
         >
           <h2 className="text-xl font-semibold text-gray-900">{course.title}</h2>
@@ -52,13 +48,13 @@ export default function HomePage() {
           <p className="mt-3 text-lg font-bold text-indigo-600">${course.price}</p>
 
           <div className="mt-5">
-            <Link
-              href={`/details/${course.id}`}
-              className="inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg font-medium 
-                         hover:bg-indigo-700 transition-colors"
-            >
-              View Details
-            </Link>
+        <Link
+  href={`/details/${encodeURIComponent(course.title)}`}
+  className="inline-block w-full text-center bg-violet-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+>
+  View Details
+</Link>
+
           </div>
         </div>
       ))}

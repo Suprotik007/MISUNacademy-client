@@ -10,7 +10,7 @@ interface SyllabusItem {
 }
 
 interface Course {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   instructor: string;
@@ -25,38 +25,41 @@ const CourseDetailsPage: React.FC = () => {
   const router = useRouter();
  
 
-  const id = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
+ const idOrTitle = params?.id ? (Array.isArray(params.id) ? params.id[0] : params.id) : undefined;
 
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) return;
 
-    const fetchCourse = async () => {
-      try {
-        const res = await fetch('/data/courses.json'); 
-        const data: Course[] = await res.json();
 
-        const foundCourse = data.find(c => c.id === id) || null;
-        setCourse(foundCourse);
-      } catch (err) {
-        console.error('Failed to fetch course:', err);
-        setCourse(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  if (!idOrTitle) return;
 
-    fetchCourse();
-  }, [id]);
+  const fetchCourse = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/courses/${encodeURIComponent(idOrTitle)}`);
+      const data: Course = await res.json();
+      setCourse(data);
+    } catch (err) {
+      console.error('Failed to fetch course:', err);
+      setCourse(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchCourse();
+}, [idOrTitle]);
+
+
+ 
 
   if (loading) return <p className="text-center mt-20 text-gray-500">Loading course...</p>;
   if (!course) return <p className="text-center mt-20 text-red-500">Course not found.</p>;
 
   const handleEnroll = () => {
-    if (id) {
-      router.push(`/PaymentPage/${course.id}`);
+    if (idOrTitle) {
+      router.push(`/PaymentPage/${course.title}`);
     } else {
       router.push('/');
     }
@@ -73,26 +76,24 @@ const CourseDetailsPage: React.FC = () => {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Syllabus</h2>
           <ul className="space-y-4">
-            {course.syllabus.map((item, index) => (
-              <li
-                key={index}
-                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm hover:shadow-md transition p-4"
-              >
-                <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-lg">{item.title}</h3>
-                <iframe
-                  src={item.videoUrl}
-                  title={item.title}
-                  width="100%"
-                  height="220"
-                  className="mt-3 rounded-lg border"
-                  allowFullScreen
-                />
-              </li>
-            ))}
+
+
+           {course.syllabus && course.syllabus.length > 0 ? (
+  course.syllabus.map((item, i) => (
+    <li key={i}>
+      <h3>{item.title}</h3>
+      <iframe src={item.videoUrl} title={item.title} />
+    </li>
+  ))
+) : (
+  <p>No syllabus available</p>
+)}
+
+            
           </ul>
         </div>
       </div>
-
+ 
       {/* Sidebar / Enrollment */}
       <div className="lg:col-span-1 sticky top-20 space-y-6">
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-lg">
@@ -116,12 +117,12 @@ const CourseDetailsPage: React.FC = () => {
 
           <p className="font-semibold mt-4 mb-2">Tags:</p>
           <div className="flex flex-wrap gap-2">
-            {course.tags.map(tag => (
+            {course.tags.map(tags => (
               <span
-                key={tag}
+                key={tags}
                 className="bg-violet-100 dark:bg-violet-700 text-violet-800 dark:text-violet-200 px-3 py-1 rounded-full text-xs"
               >
-                {tag}
+                {tags}
               </span>
             ))}
           </div>
