@@ -12,6 +12,7 @@ const Navbar: FC = () => {
 
   
   const context = useContext(AuthContext);
+  const role = context?.role;
   if (!context) return null;
 
   const { user, logOut } = context;
@@ -26,7 +27,7 @@ const Navbar: FC = () => {
       </Link>
 
       <Link
-        href="/studentDashboard"
+        href={role === "admin" ? "/adminDashboard" : "/studentDashboard"}
         className="hover:text-violet-600 dark:hover:text-violet-400 transition"
       >
         Dashboard

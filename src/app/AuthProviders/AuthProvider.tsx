@@ -1,4 +1,5 @@
 'use client';
+
 import React, { createContext, ReactNode, useEffect, useState } from "react";
 import {
   getAuth,
@@ -31,46 +32,59 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-
+  // Create user and store in MongoDB
   const createUser = async (email: string, password: string, name: string, photo?: string) => {
     setLoading(true);
-    const res = await createUserWithEmailAndPassword(auth, email, password);
-    const firebaseUser = res.user;
+    try {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = res.user;
 
-    await updateProfile(firebaseUser, { displayName: name, photoURL: photo || "" });
+      // Update displayName and photo
+      await updateProfile(firebaseUser, { displayName: name, photoURL: photo || "" });
 
-    await fetch("http://localhost:5000/api/users/save", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uid: firebaseUser.uid,
-        name,
-        email,
-        photo: photo || "",
-        role: "student",
-      }),
-    });
+      // Save user to backend, check if already exists
+      await fetch("http://localhost:5000/api/users/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          photo: photo || "",
+          role: "student", // default role
+        }),
+      });
 
-    setUser(firebaseUser);
-    setRole("student");
+      // Set user state
+      setUser(firebaseUser);
 
-    setLoading(false);
-    return firebaseUser;
+      // Fetch role from backend
+      const roleRes = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(email)}`);
+      const data = await roleRes.json();
+      setRole(data.role || "student");
+
+      return firebaseUser;
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Login and fetch role from backend
   const signIn = async (email: string, password: string) => {
     setLoading(true);
-    const res = await signInWithEmailAndPassword(auth, email, password);
-    const firebaseUser = res.user;
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      const firebaseUser = res.user;
 
-    // Fetch role from backend
-    const roleRes = await fetch(`http://localhost:5000/api/users/${firebaseUser.uid}`);
-    const data = await roleRes.json();
-    setRole(data.role || "student");
+      // Fetch role
+      const roleRes = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(email)}`);
+      const data = await roleRes.json();
+      setRole(data.role || "student");
 
-    setUser(firebaseUser);
-    setLoading(false);
-    return firebaseUser;
+      setUser(firebaseUser);
+      return firebaseUser;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateUser = async (data: { displayName?: string; photoURL?: string }) => {
@@ -86,15 +100,17 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
     setLoading(false);
   };
 
+  // Track auth state and fetch role
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
+      if (currentUser?.email) {
         try {
-          const res = await fetch(`http://localhost:5000/api/users/${currentUser.uid}`);
+          const res = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(currentUser.email)}`);
           const data = await res.json();
           setRole(data.role || "student");
-        } catch {
+        } catch (err) {
+          console.error("Failed to fetch user role:", err);
           setRole("student");
         }
       } else {
