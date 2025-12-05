@@ -1,91 +1,115 @@
-'use client'
-import React, { useEffect, useState, createContext, ReactNode } from "react";
+'use client';
+import React, { createContext, ReactNode, useEffect, useState } from "react";
 import {
-  createUserWithEmailAndPassword,
   getAuth,
-  onAuthStateChanged,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
   updateProfile,
-  User,
+  onAuthStateChanged,
+  signOut,
+  User
 } from "firebase/auth";
 import { app } from "../../../Firebase";
 
 interface AuthContextType {
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   role: string | null;
-  setRole: React.Dispatch<React.SetStateAction<string | null>>;
   loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  createUser: (email: string, password: string) => Promise<any>;
-  signIn: (email: string, password: string) => Promise<any>;
+  createUser: (email: string, password: string, name: string, photo?: string) => Promise<User>;
+  signIn: (email: string, password: string) => Promise<User>;
   updateUser: (data: { displayName?: string; photoURL?: string }) => Promise<void>;
   logOut: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
-
 const auth = getAuth(app);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+interface Props { children: ReactNode }
 
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>("student");
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const createUser = (email: string, password: string) => {
+
+  const createUser = async (email: string, password: string, name: string, photo?: string) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    const firebaseUser = res.user;
+
+    await updateProfile(firebaseUser, { displayName: name, photoURL: photo || "" });
+
+    await fetch("http://localhost:5000/api/users/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uid: firebaseUser.uid,
+        name,
+        email,
+        photo: photo || "",
+        role: "student",
+      }),
+    });
+
+    setUser(firebaseUser);
+    setRole("student");
+
+    setLoading(false);
+    return firebaseUser;
   };
 
-  const signIn = (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
+    const res = await signInWithEmailAndPassword(auth, email, password);
+    const firebaseUser = res.user;
+
+    // Fetch role from backend
+    const roleRes = await fetch(`http://localhost:5000/api/users/${firebaseUser.uid}`);
+    const data = await roleRes.json();
+    setRole(data.role || "student");
+
+    setUser(firebaseUser);
+    setLoading(false);
+    return firebaseUser;
   };
 
-  const updateUser = (updatedData: { displayName?: string; photoURL?: string }) => {
-    if (!auth.currentUser) return Promise.resolve();
-    return updateProfile(auth.currentUser, updatedData);
+  const updateUser = async (data: { displayName?: string; photoURL?: string }) => {
+    if (!auth.currentUser) return;
+    return updateProfile(auth.currentUser, data);
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     setLoading(true);
-    return signOut(auth);
+    await signOut(auth);
+    setUser(null);
+    setRole(null);
+    setLoading(false);
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
-
-      if (!currentUser) {
-        setRole(null);
+      if (currentUser) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/users/${currentUser.uid}`);
+          const data = await res.json();
+          setRole(data.role || "student");
+        } catch {
+          setRole("student");
+        }
       } else {
-        setRole("student"); 
+        setRole(null);
       }
+      setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
-  const authData: AuthContextType = {
-    user,
-    setUser,
-    role,
-    setRole,
-    loading,
-    setLoading,
-    createUser,
-    signIn,
-    updateUser,
-    logOut,
-  };
-
-  return <AuthContext.Provider value={authData}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, role, loading, createUser, signIn, updateUser, logOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export default AuthProvider;
