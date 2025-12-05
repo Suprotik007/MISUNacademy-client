@@ -1,37 +1,60 @@
 "use client";
+
 import React, { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../AuthProviders/AuthProvider";
+
+interface Batch {
+  _id?: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+}
 
 interface Course {
   _id: string;
   title: string;
   description: string;
-  batches: { name: string }[];
+  instructor: string;
+  price: number;
+  category: string;
+  tags: string[];
+  syllabus: string[]; // YouTube links
+  batches?: Batch[];
+}
 
-  enrollments?: {
-    
-    studentEmail: string;
-    date: string;
-  }[];
+interface Enrollment {
+  _id: string;
+  userEmail: string;
+  phone: string;
+  courseTitle: string;
+}
 
-  assignments?: {
-    title: string;
-    description: string;
-    submittedBy: {
-      studentEmail: string;
-      fileUrl: string;
-      submittedAt: string;
-    }[];
-  }[];
+interface Assignment {
+  _id: string;
+  lessonId: string;
+  link: string;
+  userEmail: string;
+  userName: string;
+  submittedAt: string;
 }
 
 const AdminDashboard: React.FC = () => {
   const { role } = useContext(AuthContext);
-
   const [courses, setCourses] = useState<Course[]>([]);
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [activeTab, setActiveTab] = useState<"courses" | "enrollments" | "assignments">("courses");
+  const [enrollmentsByCourse, setEnrollmentsByCourse] = useState<Record<string, Enrollment[]>>({});
+  const [assignmentsByCourse, setAssignmentsByCourse] = useState<Record<string, Assignment[]>>({});
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState<"courses" | "enrollments" | "assignments" | "addClass">("courses");
+
+  const [newCourse, setNewCourse] = useState<Partial<Course>>({
+    title: "",
+    description: "",
+    instructor: "",
+    price: 0,
+    category: "",
+    tags: [],
+    syllabus: [],
+  });
 
   useEffect(() => {
     if (role !== "admin") return;
@@ -42,7 +65,7 @@ const AdminDashboard: React.FC = () => {
         const data = await res.json();
         setCourses(data);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load courses:", err);
       } finally {
         setLoading(false);
       }
@@ -51,32 +74,65 @@ const AdminDashboard: React.FC = () => {
     loadCourses();
   }, [role]);
 
-  const fetchEnrollments = (courseId: string) => {
-    const course = courses.find((c) => c.title === courseId) || null;
-    setSelectedCourse(course);
-    setActiveTab("enrollments");
+  // Fetch enrollments dynamically for a course
+  const fetchEnrollments = async (courseTitle: string) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/student/enrollments/${encodeURIComponent(courseTitle)}`);
+      const data: Enrollment[] = await res.json();
+      setEnrollmentsByCourse(prev => ({ ...prev, [courseTitle]: data }));
+      setActiveSection("enrollments");
+    } catch (err) {
+      console.error("Failed to fetch enrollments:", err);
+    }
   };
 
-  const fetchAssignments = (courseId: string) => {
-    const course = courses.find((c) => c.title === courseId) || null;
-    setSelectedCourse(course);
-    setActiveTab("assignments");
+  // Fetch assignments dynamically for a course
+  const fetchAssignments = async (courseId: string, courseTitle: string) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/admin/assignments/course/${courseId}`);
+      const data: Assignment[] = await res.json();
+      // Store by course title so the UI can display properly
+      setAssignmentsByCourse(prev => ({ ...prev, [courseTitle]: data }));
+      setActiveSection("assignments");
+    } catch (err) {
+      console.error("Failed to fetch assignments:", err);
+    }
+  };
+
+  // Handle adding a new course
+  const handleAddCourse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/api/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newCourse),
+      });
+      const data = await res.json();
+      setCourses(prev => [...prev, data]);
+      setNewCourse({ title: "", description: "", instructor: "", price: 0, category: "", tags: [], syllabus: [] });
+      alert("Course added successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add course");
+    }
   };
 
   if (role !== "admin") return <p className="text-center mt-20 text-red-500 text-xl">⛔ Access Denied</p>;
   if (loading) return <p className="text-center mt-20 text-lg">Loading...</p>;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto text-white">
+    <div className="p-6 max-w-7xl mx-auto text-white">
       <h1 className="text-3xl font-bold mb-6 text-center">Admin Dashboard</h1>
 
+      {/* Navigation Tabs */}
       <div className="flex gap-4 justify-center mb-8">
-        {["courses", "enrollments", "assignments"].map((tab) => (
+        {["courses", "enrollments", "assignments", "addClass"].map(tab => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab as any)}
+            onClick={() => setActiveSection(tab as any)}
             className={`px-5 py-2 rounded-lg font-semibold transition ${
-              activeTab === tab ? "bg-violet-600 shadow-lg" : "bg-gray-800 hover:bg-gray-700"
+              activeSection === tab ? "bg-violet-600 shadow-lg" : "bg-gray-800 hover:bg-gray-700"
             }`}
           >
             {tab.toUpperCase()}
@@ -84,30 +140,26 @@ const AdminDashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* COURSES VIEW */}
-      {activeTab === "courses" && (
+      {/* Courses */}
+      {activeSection === "courses" && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {courses.length === 0 && <p>No Courses Available</p>}
-          {courses.map((course) => (
+          {courses.map(course => (
             <div key={course._id} className="bg-gray-900 p-5 rounded-xl shadow-md hover:scale-[1.02] transition">
               <h3 className="text-xl font-semibold">{course.title}</h3>
               <p className="text-gray-300 text-sm mt-1">{course.description}</p>
-
-              
 
               <div className="flex gap-3 mt-4">
                 <button
                   className="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-500"
                   onClick={() => fetchEnrollments(course.title)}
                 >
-                  Enrollments
+                  View Enrollments
                 </button>
-
                 <button
                   className="px-3 py-1 bg-green-600 rounded hover:bg-green-500"
-                  onClick={() => fetchAssignments(course.title)}
+                  onClick={() => fetchAssignments(course._id, course.title)}
                 >
-                  Assignments
+                  View Assignments
                 </button>
               </div>
             </div>
@@ -115,80 +167,105 @@ const AdminDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* ENROLLMENTS VIEW */}
-      {activeTab === "enrollments" && selectedCourse && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Enrollments – {selectedCourse.title}</h2>
-
-          {selectedCourse.enrollments?.length ? (
-            <table className="w-full bg-gray-900 rounded overflow-hidden">
-              <thead className="bg-gray-800">
-                <tr>
-                  <th className="p-2 border-gray-700 border">Name</th>
-                  <th className="p-2 border-gray-700 border">Email</th>
-                  <th className="p-2 border-gray-700 border">Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedCourse.enrollments.map((e, i) => (
-                  <tr key={i} className="text-center">
-                   
-                    <td className="p-2 border-gray-800 border">{e.studentEmail}</td>
-                    <td className="p-2 border-gray-800 border">{new Date(e.date).toLocaleString()}</td>
-                  </tr>
+      {/* Enrollments */}
+      {activeSection === "enrollments" &&
+        Object.entries(enrollmentsByCourse).map(([title, list]) => (
+          <div key={title} className="mb-6">
+            <h2 className="text-2xl font-semibold mb-4">{title} Enrollments</h2>
+            {list.length === 0 ? (
+              <p>No enrollments found.</p>
+            ) : (
+              <ul className="text-gray-300">
+                {list.map(e => (
+                  <li key={e._id}>{e.userEmail} — {e.phone}</li>
                 ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No enrollments found.</p>
-          )}
-        </div>
-      )}
+              </ul>
+            )}
+          </div>
+        ))}
 
-      {/* ASSIGNMENTS VIEW */}
-      {activeTab === "assignments" && selectedCourse && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Assignments – {selectedCourse.title}</h2>
+      {/* Assignments */}
+      {activeSection === "assignments" &&
+        Object.entries(assignmentsByCourse).map(([title, list]) => (
+          <div key={title} className="mb-6">
+            <h2 className="text-2xl font-semibold mb-4">{title} Assignments</h2>
+            {list.length === 0 ? (
+              <p>No assignments found.</p>
+            ) : (
+              <ul className="text-gray-300">
+                {list.map(a => (
+                  <li key={a._id}>
+                    {a.lessonId} — {a.userName} —{" "}
+                    <a href={a.link} target="_blank" className="text-blue-400 underline">View</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
 
-          {selectedCourse.assignments?.length ? (
-            selectedCourse.assignments.map((a, i) => (
-              <div key={i} className="mb-6 bg-gray-900 p-4 rounded-xl shadow">
-                <h3 className="text-xl font-bold">{a.title}</h3>
-                <p className="text-gray-300 text-sm mb-2">{a.description}</p>
-
-                {a.submittedBy?.length ? (
-                  <table className="w-full bg-gray-800 rounded overflow-hidden">
-                    <thead>
-                      <tr>
-                        <th className="p-2 border-gray-700 border">Student</th>
-                        <th className="p-2 border-gray-700 border">File</th>
-                        <th className="p-2 border-gray-700 border">Submitted</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {a.submittedBy.map((s, j) => (
-                        <tr key={j} className="text-center">
-                          <td className="p-2 border-gray-700 border">{s.studentEmail}</td>
-                          <td className="p-2 border-gray-700 border">
-                            <a href={s.fileUrl} target="_blank" className="text-blue-400 underline">
-                              View File
-                            </a>
-                          </td>
-                          <td className="p-2 border-gray-700 border">
-                            {new Date(s.submittedAt).toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p>No submissions yet.</p>
-                )}
-              </div>
-            ))
-          ) : (
-            <p>No assignments found.</p>
-          )}
+      {/* Add Class */}
+      {activeSection === "addClass" && (
+        <div className="bg-gray-900 p-6 rounded-xl shadow-md max-w-lg mx-auto">
+          <h2 className="text-2xl font-semibold mb-4">Add New Class</h2>
+          <form className="flex flex-col gap-3" onSubmit={handleAddCourse}>
+            <input
+              type="text"
+              placeholder="Title"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.title || ""}
+              onChange={e => setNewCourse({ ...newCourse, title: e.target.value })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.description || ""}
+              onChange={e => setNewCourse({ ...newCourse, description: e.target.value })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Instructor"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.instructor || ""}
+              onChange={e => setNewCourse({ ...newCourse, instructor: e.target.value })}
+              required
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.price || 0}
+              onChange={e => setNewCourse({ ...newCourse, price: Number(e.target.value) })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.category || ""}
+              onChange={e => setNewCourse({ ...newCourse, category: e.target.value })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Tags (comma separated)"
+              className="p-2 rounded bg-gray-800"
+              value={newCourse.tags?.join(",") || ""}
+              onChange={e => setNewCourse({ ...newCourse, tags: e.target.value.split(",") })}
+            />
+            <input
+              type="text"
+              placeholder="Syllabus video link (YouTube)"
+              className="p-2 rounded bg-gray-800"
+              onChange={e => setNewCourse({ ...newCourse, syllabus: [e.target.value] })}
+            />
+            <button type="submit" className="bg-violet-600 px-4 py-2 rounded mt-2 hover:bg-violet-500">
+              Add Class
+            </button>
+          </form>
         </div>
       )}
     </div>
