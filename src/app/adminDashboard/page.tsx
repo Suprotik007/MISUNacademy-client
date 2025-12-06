@@ -61,7 +61,7 @@ const AdminDashboard: React.FC = () => {
 
     const loadCourses = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/courses");
+        const res = await fetch(" https://misun-academy-server.vercel.app/api/courses");
         const data = await res.json();
         setCourses(data);
       } catch (err) {
@@ -71,13 +71,14 @@ const AdminDashboard: React.FC = () => {
       }
     };
 
+   
     loadCourses();
   }, [role]);
 
   // Fetch enrollments dynamically for a course
   const fetchEnrollments = async (courseTitle: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/student/enrollments/${encodeURIComponent(courseTitle)}`);
+      const res = await fetch(` https://misun-academy-server.vercel.app/api/student/enrollments/${encodeURIComponent(courseTitle)}`);
       const data: Enrollment[] = await res.json();
       setEnrollmentsByCourse(prev => ({ ...prev, [courseTitle]: data }));
       setActiveSection("enrollments");
@@ -89,7 +90,7 @@ const AdminDashboard: React.FC = () => {
   // Fetch assignments dynamically for a course
   const fetchAssignments = async (courseId: string, courseTitle: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/assignments/course/${courseId}`);
+      const res = await fetch(` https://misun-academy-server.vercel.app/api/admin/assignments/course/${courseId}`);
       const data: Assignment[] = await res.json();
       // Store by course title so the UI can display properly
       setAssignmentsByCourse(prev => ({ ...prev, [courseTitle]: data }));
@@ -103,7 +104,7 @@ const AdminDashboard: React.FC = () => {
   const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/courses", {
+      const res = await fetch(" https://misun-academy-server.vercel.app/api/courses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCourse),

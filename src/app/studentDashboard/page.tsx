@@ -28,7 +28,7 @@ const StudentDashboard: React.FC = () => {
     const fetchEnrollments = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/student/enrollments/${encodeURIComponent(authContext.user.email)}`
+          ` https://misun-academy-server.vercel.app/api/student/enrollments/${encodeURIComponent(authContext.user.email)}`
         );
         const data: Enrollment[] = await res.json();
         setEnrollments(data);
@@ -45,7 +45,7 @@ const StudentDashboard: React.FC = () => {
   const markLessonCompleted = async (enrollId: string, lessonTitle: string) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/student/enrollments/${enrollId}/complete`,
+        ` https://misun-academy-server.vercel.app/api/student/enrollments/${enrollId}/complete`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

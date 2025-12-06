@@ -43,7 +43,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       await updateProfile(firebaseUser, { displayName: name, photoURL: photo || "" });
 
       // Save user to backend, check if already exists
-      await fetch("http://localhost:5000/api/users/save", {
+      await fetch(" https://misun-academy-server.vercel.app/api/users/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -58,7 +58,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       setUser(firebaseUser);
 
       // Fetch role from backend
-      const roleRes = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(email)}`);
+      const roleRes = await fetch(` https://misun-academy-server.vercel.app/api/users/${encodeURIComponent(email)}`);
       const data = await roleRes.json();
       setRole(data.role || "student");
 
@@ -76,7 +76,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       const firebaseUser = res.user;
 
       // Fetch role
-      const roleRes = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(email)}`);
+      const roleRes = await fetch(` https://misun-academy-server.vercel.app/api/users/${encodeURIComponent(email)}`);
       const data = await roleRes.json();
       setRole(data.role || "student");
 
@@ -106,7 +106,7 @@ const AuthProvider: React.FC<Props> = ({ children }) => {
       setUser(currentUser);
       if (currentUser?.email) {
         try {
-          const res = await fetch(`http://localhost:5000/api/users/${encodeURIComponent(currentUser.email)}`);
+          const res = await fetch(` https://misun-academy-server.vercel.app/api/users/${encodeURIComponent(currentUser.email)}`);
           const data = await res.json();
           setRole(data.role || "student");
         } catch (err) {

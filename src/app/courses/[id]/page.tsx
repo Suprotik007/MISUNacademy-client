@@ -36,13 +36,13 @@ const CoursePage: React.FC = () => {
     const fetchCourse = async () => {
       try {
         // Fetch course info
-        const courseRes = await fetch(`http://localhost:5000/api/courses/${courseId}`);
+        const courseRes = await fetch(` https://misun-academy-server.vercel.app/api/courses/${courseId}`);
         const courseData: Course = await courseRes.json();
         setCourse(courseData);
 
         // Fetch enrollment for this student
         const enrollRes = await fetch(
-          `http://localhost:5000/api/student/enrollment/${encodeURIComponent(user.email)}/${courseId}`
+          ` https://misun-academy-server.vercel.app/api/student/enrollment/${encodeURIComponent(user.email)}/${courseId}`
         );
         const enrollmentData: Enrollment = await enrollRes.json();
         setCompletedLessons(enrollmentData?.completedLessons || []);
@@ -62,7 +62,7 @@ const CoursePage: React.FC = () => {
 
     try {
       
-      await fetch('http://localhost:5000/api/student/complete-lesson', {
+      await fetch(' https://misun-academy-server.vercel.app/api/student/complete-lesson', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

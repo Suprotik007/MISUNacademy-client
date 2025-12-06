@@ -37,7 +37,7 @@ useEffect(() => {
   const fetchCourse = async () => {
     try {
  
-      const res = await fetch(`http://localhost:5000/api/courses/${encodeURIComponent(id)}`);
+      const res = await fetch(` https://misun-academy-server.vercel.app/api/courses/${encodeURIComponent(id)}`);
       if (!res.ok) throw new Error('Course not found');
       const data: Course = await res.json();
       setCourse(data);
@@ -61,7 +61,7 @@ const handlePayment = async (e: FormEvent) => {
   }
 
   try {
-    const res = await fetch("http://localhost:5000/api/student/enroll", {
+    const res = await fetch(" https://misun-academy-server.vercel.app/api/student/enroll", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

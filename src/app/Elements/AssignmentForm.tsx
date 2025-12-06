@@ -44,7 +44,7 @@ const AssignmentForm = ({ courseId, courseTitle, lessonId, lessonTitle, onClose 
     console.log("Submitting assignment:", payload);
 
     try {
-      const res = await fetch("http://localhost:5000/api/assignments/submit", {
+      const res = await fetch(" https://misun-academy-server.vercel.app/api/assignments/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
